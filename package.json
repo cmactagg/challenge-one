@@ -1,0 +1,24 @@
+{
+  "name": "challenge-one",
+  "version": "0.1.0",
+  "description": "Simple Node developer challenge.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmactagg/challenge-one.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cmactagg/challenge-one/issues"
+  },
+  "homepage": "https://github.com/cmactagg/challenge-one#readme",
+  "preferGlobal": true,
+  "bin": {
+    "store": "./index.js"
+  }
+
+}
