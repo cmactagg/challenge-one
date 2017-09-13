@@ -3,10 +3,11 @@
 
 var fs = require('fs');
 
-const storeFile = __dirname;
+const keyValueFilePath = __dirname + "\\_store.json";
 
 let args = process.argv.slice(2);
 
+//determine command
 if(args.length > 0){
     let commandName = args[0];
     let params = args.slice(1);
@@ -24,84 +25,100 @@ if(args.length > 0){
             removeValueFromStore(...params);
             break;
     }
-} else{
+} else {
     //todo:  spit out some help.
     console.log("No commands provided.");
 }
 
-function loadValuesObject(success, error){
-    fs.readFile(storeFile + "\_store.json", function (err, data) {  
-        let storeObj = new Object(); 
-        if (err) {            
+//loads the keyvalue object from file and into an object
+function loadKeyValueObject(success, error){
+    fs.readFile(keyValueFilePath, function (err, data) {  
+        let keyValueObj = undefined;
+        if (err != undefined && err.code !== "ENOENT") {  
+            //error other than file/directory doesnt exist
+            error(err);
+        } else {
+            keyValueObj = new Object();
+            if(data != undefined){   
+                //todo:  check correupt file  
+                keyValueObj = JSON.parse(data);                
+            }
+            success(keyValueObj);
+        }        
+    });
+}
+
+function saveKeyValueObject(keyValueObj, success, error){
+    fs.writeFile(keyValueFilePath, JSON.stringify(keyValueObj), function(err){
+        if(err) {
             error(err);
         }
-        
-        if(data != undefined){     
-            storeObj = JSON.parse(data); 
-            success(storeObj);
-        }
+        success();
     });
 }
 
 function addValueToStore(key, value){
-    loadValuesObject(function(storeObj){
-        storeObj[key] = value;
-        fs.writeFile(storeFile + "\_store.json", JSON.stringify(storeObj), function(err) {
-            if(err) {
-                return console.log(err);
-            }
-    
-            console.log("The file was saved!");
-            process.exit();
-        }); 
+    loadKeyValueObject(function(keyValueObj){
+            keyValueObj[key] = value;
+
+            saveKeyValueObject(keyValueObj, function(){
+                //todo:  better message
+                console.log("The file was saved!");
+                process.exit();
+            },
+            (err)=> console.log(err)
+        );
+
     }, 
-    
-    
-    (err)=>{console.log("error loading data")}
-);
+        //todo:  better error message
+        (err)=>{console.log("error loading data")}
+    );
     
 }
 
+function removeValueFromStore(key){
+    loadKeyValueObject(function(keyValueObj){
+        delete keyValueObj[key];
+        saveKeyValueObject(keyValueObj, function(){
+            //todo:  better message
+            console.log("The file was saved!");
+            process.exit();
+        },
+        (err)=> console.log(err)
+    );
+
+    }, 
+        //todo:  better error message
+    (err)=>{console.log("error loading data")}
+);
+}
+
+
+
+
 function listValuesInStore(){
-    loadValuesObject(function(storeObj){
-        for(var key in storeObj){
-            if(storeObj.hasOwnProperty(key)){
-                console.log(key + '\t' + storeObj[key]);
+    loadKeyValueObject(function(keyValueObj){
+        for(var key in keyValueObj){
+            if(keyValueObj.hasOwnProperty(key)){
+                console.log(key + '\t' + keyValueObj[key]);
             }
         }
         process.exit();
         
     },   
-    
+    //todo:  better error message
     (err)=>{console.log("error loading data")}
 );
 }
 
 function getValueFromStore(key){
-    loadValuesObject(function(storeObj){
-        console.log(storeObj[key]);
+    loadKeyValueObject(function(keyValueObj){
+        console.log(keyValueObj[key]);
         process.exit();
         
     },   
-    
+    //todo:  better error message
     (err)=>{console.log("error loading data")}
 );
 }
 
-function removeValueFromStore(key){
-    loadValuesObject(function(storeObj){
-        delete storeObj[key];
-        fs.writeFile(storeFile + "\_store.json", JSON.stringify(storeObj), function(err) {
-            if(err) {
-                return console.log(err);
-            }
-    
-            console.log("The file was saved!");
-            process.exit();
-        }); 
-    }, 
-    
-    
-    (err)=>{console.log("error loading data")}
-);
-}
