@@ -18,9 +18,8 @@
                 "name": "Launch Program",
                 "program": "${workspaceRoot}\\index.js",
                 "args":[
-                    "remove",
-                    "a",
-                    "2"
+                    "add",
+                    "ggg"
                 ]
             }
         ]
