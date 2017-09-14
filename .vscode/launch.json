@@ -19,7 +19,8 @@
                 "program": "${workspaceRoot}\\index.js",
                 "args":[
                     "add",
-                    "ggg"
+                    "cat",
+                    "55"
                 ]
             }
         ]
